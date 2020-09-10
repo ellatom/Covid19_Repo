@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const proxy = `https://cors-proxy.htmldriven.com/?url=`;
+      const baseRegion = `https://restcountries.herokuapp.com/api/v1`;
+      const baseStatistics = ` https://corona-api.com/countries`;
+      const region = "";
+
+      let stats = [];
+
+      async function getRegionAndCountry() {
+        try {
+          const res = await fetch(`${baseRegion}`); //${proxy}
+          const data = await res.json();
+          console.log(data);
+          return data;
+        } catch (err) {
+          console.log("coutries fetching failed" + err);
+        }
+      }
+
+      async function getStatistic() {
+        try {
+          const res = await fetch(`${baseStatistics}`); //${proxy}
+          const data = await res.json();
+          console.log(data);
+          return data;
+        } catch (err) {
+          console.log("statistics fetching failed" + err);
+        }
+      }
+      function setStatistic(statistics) {
+        statistics.data.forEach((element) => {
+          stats.push({
+            country: element.name,
+            latestData: [
+              { deaths: element.latest_data.deaths },
+              { confirmed: element.latest_data.confirmed },
+              { recovered: element.latest_data.recovered },
+              { critical: element.latest_data.critical },
+            ],
+          });
+        });
+        console.log(stats);
+      }
+      function setRegionCountryData(regionCountry) {
+          regionCountry.forEach((elementCountry) => {
+            let statsItem = stats.find(
+              (country) => country == elementCountry.name.common
+            );
+
+            statsItem = null;
+            statsItem.region = elementCountry.region;
+          });
+      }
+
+      async function init() {
+        try {
+          let statistic = await getStatistic();
+          setStatistic(statistic);
+          let regionCountry = await getRegionAndCountry();
+          setRegionCountryData(regionCountry);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+        init();
+    
+    </script>
+  </body>
+</html>
