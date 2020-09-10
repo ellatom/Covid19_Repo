@@ -39,6 +39,7 @@
         statistics.data.forEach((element) => {
           stats.push({
             country: element.name,
+            code: element.code,
             latestData: [
               { deaths: element.latest_data.deaths },
               { confirmed: element.latest_data.confirmed },
@@ -50,13 +51,20 @@
         console.log(stats);
       }
       function setRegionCountryData(regionCountry) {
-          regionCountry.forEach((elementCountry) => {
-            let statsItem = stats.find(
-              (country) => country == elementCountry.name.common
-            );
+        regionCountry.forEach((elementCountry) => {
+          let statsItem = stats.find(
+            (item) => item.code === elementCountry.cca2
+          );
 
-            statsItem.region = elementCountry.region;
-          });
+          if (!statsItem) {
+            console.warn(
+              `Country '${elementCountry.name.common}' was not found`
+            );
+            return;
+          }
+
+          statsItem.region = elementCountry.region;
+        });
       }
 
       async function init() {
@@ -70,8 +78,7 @@
         }
       }
 
-        init();
-    
+      init();
     </script>
   </body>
 </html>
