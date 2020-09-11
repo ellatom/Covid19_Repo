@@ -3,13 +3,67 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"
+    ></script>
+    <title>Covid19 Data</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      .mainContainer {
+        margin: 0 auto;
+      }
+      /* #myChart{
+      position: relative;
+      }   */
+      /* height:40vh;  */
+      /* width:40vw; */
+      /* height:50%;
+        width:50% */
+      button {
+        margin: 3px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+      }
+      .buttonsStatsExtendedData{
+        background-color: lightblue;
+        margin-bottom: 10px;
+      }
+      .buttonsRegionContainer {
+        background-color: blueviolet;
+        margin-bottom: 10px;
+      }
+      h2 {
+        font: 0.8rem;
+        text-align: center;
+      }
+      .buttonsCountriesContainer {
+        display: block;
+        background-color: grey;
+      }
+
+    </style>
   </head>
   <body>
+    <div class="mainContainer">
+      <h2>Covid19 Data</h2>
+      <canvas id="myChart"></canvas>
+      <div class="buttonsStatsExtendedData"></div>
+      <div class="buttonsRegionContainer"></div>
+      <div class="buttonsCountriesContainer"></div>
+    </div>
     <script>
       const proxy = `https://cors-proxy.htmldriven.com/?url=`;
       const baseRegion = `https://restcountries.herokuapp.com/api/v1`;
       const baseStatistics = ` https://corona-api.com/countries`;
+      const baseStatisticsExtended = `https://corona-api.com/countries/`;
       const region = "";
 
       let stats = [];
@@ -35,17 +89,33 @@
           console.log("statistics fetching failed" + err);
         }
       }
+
+      // async function getStatisticExtended() {
+      //   try {
+      //     stats.forEach(element=>
+      //     {
+      //       const res = await fetch(`${baseStatisticsExtended}${countryCode}`); //${proxy}
+      //       const data = await res.json();
+      //       console.log(data);
+      //       return data;
+      //     })
+
+      //   } catch (err) {
+      //     console.log("statistics fetching failed" + err);
+      //   }
+      // }
+
       function setStatistic(statistics) {
         statistics.data.forEach((element) => {
           stats.push({
             country: element.name,
             code: element.code,
-            latestData: [
-              { deaths: element.latest_data.deaths },
-              { confirmed: element.latest_data.confirmed },
-              { recovered: element.latest_data.recovered },
-              { critical: element.latest_data.critical },
-            ],
+            latestData: {
+              deaths: element.latest_data.deaths,
+              confirmed: element.latest_data.confirmed,
+              recovered: element.latest_data.recovered,
+              critical: element.latest_data.critical,
+            },
           });
         });
         console.log(stats);
@@ -73,12 +143,135 @@
           setStatistic(statistic);
           let regionCountry = await getRegionAndCountry();
           setRegionCountryData(regionCountry);
+          //createChart(stats);
+          // let extendedStatperCountry= await getStatisticExtended();
+          // setExtendedDAta(extendedStatperCountry);
+
+          createUI();
         } catch (err) {
           console.error(err);
         }
       }
 
+      function createUI() {
+        createRegionButtons();
+        createExtendedStatsButtons();
+      }
+      function createRegionButtons() {
+        let regions = new Set(stats.map((o) => o.region));
+        let sortedRegions = Array.from(new Set(regions)).sort();
+
+        let buttonsRegion = document.querySelector(".buttonsRegionContainer");
+
+        sortedRegions.forEach((region) => {
+          if (region == "") return;
+
+          let buttonRegion = buttonsRegion.appendChild(
+            document.createElement("button")
+          );
+          buttonRegion.innerText = region;
+          buttonRegion.addEventListener("click", onRegionClickDisplayCountries);
+        });
+      }
+      function createExtendedStatsButtons()
+      {
+        let statsExtendedContainer=document.querySelector(".buttonsStatsExtendedData");
+        Object.keys(stats[0].latestData).forEach(key=>{
+        let button= document.createElement("button");
+        button.innerText=key;
+        statsExtendedContainer.appendChild(button);
+        // button.addEventListener("click", onClickDisplayExtendedData);
+        });
+
+      }
+
+      function onRegionClickDisplayCountries(e) {
+
+        let buttonsCountry = document.querySelector(".buttonsCountriesContainer");
+        buttonsCountry.innerHTML = "";
+
+        let originCountries = stats.filter(
+          (element) => element.region === this.innerText
+        );
+
+        let originCountriesSorted = originCountries.sort();
+
+        originCountries.forEach((element) => {
+          let buttonCountry = buttonsCountry.appendChild(
+            document.createElement("button")
+          );
+          buttonCountry.innerText = element.country;
+        });
+
+        createChart(stats, this.innerText);
+      }
+
       init();
+    </script>
+
+    <script>
+      let myChart = null;
+
+      function createChartContext()
+      {
+        var ctx = document.getElementById("myChart").getContext("2d");
+        ctx.canvas.parentNode.style.height = "80vh";
+        ctx.canvas.parentNode.style.width = "80vw";
+        return ctx;
+      }
+      
+      function createChart(stats, region) {
+
+        let filteredByRegion = stats.filter((o) => o.region === region); //region example:Africa
+        let filteredCountryByRegion = filteredByRegion.map((o) => o.country);
+        let datasets = [
+          {
+            label: "confirmed",//label per country
+            data: filteredByRegion.map((o) => o.latestData.confirmed),
+            backgroundColor: filteredByRegion.map((o) => getRandomColor()),
+          },
+        ];
+
+        createChartCanvas(filteredCountryByRegion, datasets);
+      }
+
+      function createChartCanvas(labels, datasets)
+      {
+        let ctx=createChartContext();
+
+        myChart && myChart.destroy();
+
+        myChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels, 
+            datasets
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+              xAxes: [{ stacked: false }],
+              yAxes: [{ stacked: false }],
+            },
+  
+            legend: {
+              display: true,
+              labels: {
+                // This more specific font property overrides the global property
+                font: {
+                  color: "black",
+                  size: 6
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function getRandomColor() {
+        return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+      }
     </script>
   </body>
 </html>
