@@ -24,12 +24,9 @@
       button {
         margin: 3px;
         border-radius: 4px;
-        font-size: 0.8rem;
+        font-size: 0.9rem;
       }
 
-      button {
-        font-size: 0.4rem;
-      }
       .buttonsStatsExtendedData {
         background-color: lightblue;
         margin-bottom: 10px;
@@ -50,7 +47,7 @@
         text-align: center;
       }
       .countriesContainer select {
-        font-size: 0.5rem;
+        font-size: 0.9rem;
       }
       .chartContainer {
         height: 60vh;
@@ -66,7 +63,7 @@
         border: 1px solid black;
         margin: 10px;
         padding: 20px;
-        font-size: 0.5rem;
+        font-size: 0.7rem;
       }
       .clickedButton
       {
@@ -338,7 +335,7 @@
         let ctx = createChartContext();
 
         if (myChart) myChart.destroy();
-
+        Chart
         myChart = new Chart(ctx, {
           type: "line",
           data: {
@@ -352,13 +349,13 @@
               xAxes: [
                 {
                   stacked: false,
-                  ticks: { fontSize: 6 },
+                  ticks: { fontSize: 9 },
                 },
               ],
               yAxes: [
                 {
                   stacked: false,
-                  ticks: { fontSize: 6 },
+                  ticks: { fontSize: 9 },
                 },
               ],
             },
