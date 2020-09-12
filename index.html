@@ -20,13 +20,7 @@
       .mainContainer {
         margin: 0 auto;
       }
-      /* #myChart{
-      position: relative;
-      }   */
-      /* height:40vh;  */
-      /* width:40vw; */
-      /* height:50%;
-        width:50% */
+
       button {
         margin: 3px;
         border-radius: 4px;
@@ -74,6 +68,10 @@
         padding: 20px;
         font-size: 0.5rem;
       }
+      .clickedButton
+      {
+        border: 2px solid red;
+      }
     </style>
   </head>
   <body>
@@ -88,19 +86,25 @@
       <div class="countriesContainer"></div>
     </div>
     <script>
+      //API URL
       const proxy = `https://cors-proxy.htmldriven.com/?url=`;
       const baseRegion = `https://restcountries.herokuapp.com/api/v1`;
       const baseStatistics = ` https://corona-api.com/countries`;
       const baseStatisticsExtended = `https://corona-api.com/countries/`;
+
+      //used variables
       let currentRegion = null;
+      let temp=null;
       let currentCountry = null;
       let currentDataType = "deaths";
+      let currentDataTypeButton = null;
+      let currentRegionButton = null;
       let myChart = null;
 
+      //Data fetched from api
       let stats = [];
 
       //// Api
-
       async function getRegionAndCountry() {
         try {
           const res = await fetch(`${baseRegion}`); //${proxy}
@@ -174,10 +178,8 @@
 
           let regionCountry = await getRegionAndCountry();
           setRegionCountryData(regionCountry);
-          // let extendedStatperCountry= await getStatisticExtended();
-          // setExtendedDAta(extendedStatperCountry);
-
           createUI();
+
         } catch (err) {
           console.error(err);
         }
@@ -208,22 +210,31 @@
         let buttonsRegion = document.querySelector(".buttonsRegionContainer");
 
         sortedRegions.forEach((region) => {
-          if (region == "") return;
+          if (region == "") return ;//
 
           let buttonRegion = buttonsRegion.appendChild(
             document.createElement("button")
           );
+
           buttonRegion.innerText = region;
           buttonRegion.addEventListener("click", onRegionClickDisplayCountries);
         });
       }
 
       function onClickDisplayExtendedData() {
+
+        colorButton(currentDataTypeButton, this);
+        currentDataTypeButton = this;
+
         currentDataType = this.innerText;
         createChart(stats);
       }
 
       function onRegionClickDisplayCountries(e) {
+
+        colorButton(currentRegionButton, this);
+        currentRegionButton=this;
+      
         let ctx = document.getElementById("myChart");
         ctx.style.display = "block";
 
@@ -263,9 +274,11 @@
       }
 
       async function onCountryChanged(e) {
+      
         currentCountry = this.options[this.selectedIndex].value;
-       
-        if (currentCountry === "") return;
+
+        if (currentCountry === "") 
+          return ;
 
         if (myChart) myChart.destroy();
         let ctx = document.getElementById("myChart");
@@ -276,12 +289,12 @@
         let data = await getStatisticExtended(statsItem.code);
 
         let dataTotal = [
-          { title: "Total cases", value: data.timeline[0].confirmed },
-          { title: "New cases", value: data.timeline[0].new_confirmed },
-          { title: "Total Deaths", value: data.timeline[0].deaths },
-          { title: "Deaths", value: data.timeline[0].new_deaths },
-          { title: "Total recovered", value: data.timeline[0].recovered },
-          { title: "Critical", value: data.timeline[0].active },
+          { title: "Total cases", value: (data.timeline.length>0 ?data.timeline[0].confirmed:"0")},//there are some properties which dont exists for country in api and other countries api have
+          { title: "New cases", value: (data.timeline.length>0 ?data.timeline[0].new_confirmed:"0")},
+          { title: "Total Deaths", value: (data.timeline.length>0 ? data.timeline[0].deaths:"0")},
+          { title: "Deaths", value: (data.timeline.length>0 ? data.timeline[0].new_deaths:"0" )},
+          { title: "Total recovered", value:(data.timeline.length>0 ?data.timeline[0].recovered:"0")},
+          { title: "Critical", value: (data.timeline.length>0 ?data.timeline[0].active:"0")},
         ];
 
         let countriesExtendedDataContainer = document.querySelector(
@@ -302,7 +315,6 @@
       init();
 
       ////////// Charts
-
       function createChartContext() {
         var ctx = document.getElementById("myChart").getContext("2d");
         return ctx;
@@ -364,7 +376,21 @@
         });
       }
 
-      /////// Tools
+      // function hideCanvas() {}future
+
+      // function showCanvas() {}future
+
+      // function hideExtendedData(){}future
+
+      // function showExtendedData(){}future
+      
+      /////// Utility of graph
+      function colorButton(oldButton, newButton)
+      {
+        if (oldButton !== null)
+          oldButton.classList.remove("clickedButton");
+        newButton.classList.add("clickedButton");
+      }
 
       function getRandomColor() {
         return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
