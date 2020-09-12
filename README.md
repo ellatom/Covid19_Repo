@@ -7,3 +7,5 @@ The user is choosing which data he would like to see in graph chart.
 <li>After a country is chosen a statistics is displayed :
   total cases, new cases, total deaths, new deaths, total recovered, in critical condition</li>
   </ul>
+  
+  <p> download extension Moesif CORS and turn on to see data.
