@@ -1,0 +1,66 @@
+*,
+*::before,
+*::after,
+body,
+html {
+  padding: 0;
+  margin: 0;
+  box-sizing: content-box;
+}
+
+:root {
+    --font-size: 0.9rem;
+}
+
+.mainContainer {
+  margin: 0 auto;
+}
+
+button {
+  margin: 3px;
+  border-radius: 4px;
+  font-size: var(--font-size);
+}
+
+.buttonsStatsExtendedData {
+  background-color: lightblue;
+  margin-bottom: 10px;
+  text-align: center;
+}
+.buttonsRegionContainer {
+  background-color: blueviolet;
+  margin-bottom: 10px;
+  text-align: center;
+}
+h2 {
+  font-size: var(--font-size);
+  text-align: center;
+}
+.countriesContainer {
+  display: block;
+  background-color: grey;
+  text-align: center;
+}
+.countriesContainer select {
+  font-size: var(--font-size);
+}
+.chartContainer {
+  height: 60vh;
+  margin: 0 10px;
+}
+.countriesExtendedDataContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 10px;
+}
+.countriesExtendedDataContainer div {
+  border: 1px solid black;
+  margin: 10px;
+  padding: 20px;
+  font-size: 0.7rem;
+}
+.clickedButton {
+  border: 2px solid red;
+}
