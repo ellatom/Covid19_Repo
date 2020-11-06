@@ -11,5 +11,5 @@ The user is choosing which data he would like to see in graph chart.
   total cases, new cases, total deaths, new deaths, total recovered, in critical condition</li>
   </ul>
   
-  <p> download extension Moesif CORS and turn on to see data.
-![](graph.png)
+  <p> download extension Moesif CORS and turn on to see data.<br>
+![](graph.jpeg)
