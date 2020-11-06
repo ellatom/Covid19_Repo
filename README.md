@@ -12,4 +12,4 @@ The user is choosing which data he would like to see in graph chart.
   </ul>
   
   <p> download extension Moesif CORS and turn on to see data.<br>
-![](graph.jpeg)
+
